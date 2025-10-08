@@ -11,6 +11,12 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
 
+void DrawChessboard()
+{
+	DrawRectangle(100, 100, 64 * 8, 64 * 8, WHITE);
+	// TODO: Finish up drawing this chessboard
+}
+
 int main ()
 {
 	// Tell the window to use vsync and work on high DPI displays
@@ -34,11 +40,8 @@ int main ()
 		// Setup the back buffer for drawing (clear color and depth buffers)
 		ClearBackground(BLACK);
 
-		// draw some text using the default font
-		DrawText("Hello Raylib", 200,200,20,WHITE);
+		DrawChessboard();
 
-		// draw our texture to the screen
-		DrawTexture(wabbit, 400, 200, WHITE);
 		
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
