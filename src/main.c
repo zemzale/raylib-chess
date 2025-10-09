@@ -34,6 +34,12 @@ void DrawChessboard() {
   }
 }
 
+void DrawBackground() {
+    Color fromGradient = { .r = 90, .g = 250, .b = 245, .a = 100 };
+    Color toGradient = { .r = 90, .g = 250, .b = 245, .a = 50 };
+    DrawRectangleGradientV(0, 0, GetScreenWidth(), GetScreenHeight(), fromGradient, toGradient);
+}
+
 int main() {
   // Tell the window to use vsync and work on high DPI displays
   SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
@@ -57,6 +63,7 @@ int main() {
 
     // Setup the back buffer for drawing (clear color and depth buffers)
     ClearBackground(BLACK);
+    DrawBackground();
 
     DrawChessboard();
 
