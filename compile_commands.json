@@ -1,0 +1,7 @@
+[
+    {
+        "directory": "/home/azemzale/git/personal/raylib-chess",
+        "command": "gcc -o ./bin/Debug/raylib-chess -s -O2 -I ./build/external/raylib-master/src -I ./build/external/raylib-master/src/external/glfw/include -I ./include",
+        "file": "/home/azemzale/git/personal/raylib-chess/src/main.c"
+    }
+]
