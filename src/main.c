@@ -12,21 +12,24 @@ https://creativecommons.org/publicdomain/zero/1.0/
 
 #include "resource_dir.h" // utility header for SearchAndSetResourceDir
 //
-const int BOARD_WIDTH = 64 * 8;
+
+const float PIECE_SCALE = 0.45f;
+const int BOARD_CELL_SIZE = 64;
+const int BOARD_WIDTH = BOARD_CELL_SIZE * 8;
 
 void DrawChessboard() {
   bool isWhite = true;
   Color sqrColor = WHITE;
-  Vector2 pos = {.x = 64, .y = 64};
-  Vector2 size = {.x = 64, .y = 64};
+  Vector2 pos = {.x = BOARD_CELL_SIZE, .y = BOARD_CELL_SIZE};
+  Vector2 size = {.x = BOARD_CELL_SIZE, .y = BOARD_CELL_SIZE};
 
   int offsetX = GetScreenWidth() / 2 - BOARD_WIDTH / 2;
   int offsetY = GetScreenHeight() / 2 - BOARD_WIDTH / 2;
 
   for (int x = 0; x < 8; x++) {
     for (int y = 0; y < 8; y++) {
-      pos.x = offsetX + (64 * x);
-      pos.y = offsetY + (64 * y);
+      pos.x = offsetX + (BOARD_CELL_SIZE * x);
+      pos.y = offsetY + (BOARD_CELL_SIZE * y);
       DrawRectangleV(pos, size, isWhite ? WHITE : BLACK);
       isWhite = !isWhite;
     }
@@ -35,9 +38,29 @@ void DrawChessboard() {
 }
 
 void DrawBackground() {
-    Color fromGradient = { .r = 90, .g = 250, .b = 245, .a = 100 };
-    Color toGradient = { .r = 90, .g = 250, .b = 245, .a = 50 };
-    DrawRectangleGradientV(0, 0, GetScreenWidth(), GetScreenHeight(), fromGradient, toGradient);
+  Color fromGradient = {.r = 90, .g = 250, .b = 245, .a = 100};
+  Color toGradient = {.r = 90, .g = 250, .b = 245, .a = 50};
+  DrawRectangleGradientV(0, 0, GetScreenWidth(), GetScreenHeight(), fromGradient, toGradient);
+}
+
+void DrawPiece(Texture texture, Vector2 pos) {
+
+  int textureOffsetX = (BOARD_CELL_SIZE - texture.width * PIECE_SCALE) / 2;
+  int textureOffsetY = (BOARD_CELL_SIZE - texture.height * PIECE_SCALE) / 2;
+
+  pos.x += textureOffsetX;
+  pos.y += textureOffsetY;
+
+  DrawTextureEx(texture, pos, 0.0f, PIECE_SCALE, WHITE);
+}
+
+void DrawPieces(Texture pawn) {
+  int offsetX = GetScreenWidth() / 2 - BOARD_WIDTH / 2;
+  int offsetY = GetScreenHeight() / 2 - BOARD_WIDTH / 2;
+
+  Vector2 pos = {.x = offsetX, .y = offsetY};
+
+  DrawPiece(pawn, pos);
 }
 
 int main() {
@@ -45,14 +68,13 @@ int main() {
   SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
 
   // Create the window and OpenGL context
-  InitWindow(1280, 800, "Hello Raylib");
+  InitWindow(1920, 1080, "Hello Raylib");
 
   // Utility function from resource_dir.h to find the resources folder and set
   // it as the current working directory so we can load from it
   SearchAndSetResourceDir("resources");
 
-  // Load a texture from the resources directory
-  Texture wabbit = LoadTexture("wabbit_alpha.png");
+  Texture pawn = LoadTexture("w_pawn_png_128px.png");
 
   // game loop
   while (!WindowShouldClose()) // run the loop untill the user presses ESCAPE or
@@ -66,6 +88,7 @@ int main() {
     DrawBackground();
 
     DrawChessboard();
+    DrawPieces(pawn);
 
     // end the frame and get ready for the next one  (display frame, poll input,
     // etc...)
@@ -74,7 +97,7 @@ int main() {
 
   // cleanup
   // unload our texture so it can be cleaned up
-  UnloadTexture(wabbit);
+  UnloadTexture(pawn);
 
   // destroy the window and cleanup the OpenGL context
   CloseWindow();
