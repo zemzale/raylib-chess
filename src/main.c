@@ -9,9 +9,7 @@ https://creativecommons.org/publicdomain/zero/1.0/
 */
 
 #include "raylib.h"
-
-#include "resource_dir.h" // utility header for SearchAndSetResourceDir
-//
+#include "texture_loader.h"
 
 const float PIECE_SCALE = 0.45f;
 const int BOARD_CELL_SIZE = 64;
@@ -54,13 +52,83 @@ void DrawPiece(Texture texture, Vector2 pos) {
   DrawTextureEx(texture, pos, 0.0f, PIECE_SCALE, WHITE);
 }
 
-void DrawPieces(Texture pawn) {
+void DrawPieces(TextureStore *store) {
   int offsetX = GetScreenWidth() / 2 - BOARD_WIDTH / 2;
   int offsetY = GetScreenHeight() / 2 - BOARD_WIDTH / 2;
 
   Vector2 pos = {.x = offsetX, .y = offsetY};
 
-  DrawPiece(pawn, pos);
+  DrawPiece(store->textures[W_ROOK], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[W_KNIGHT], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[W_BISHOP], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[W_QUEEN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[W_KING], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[W_BISHOP], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[W_KNIGHT], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[W_ROOK], pos);
+
+  pos.x = offsetX;
+  pos.y += BOARD_CELL_SIZE;
+
+  DrawPiece(store->textures[W_PAWN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[W_PAWN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[W_PAWN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[W_PAWN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[W_PAWN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[W_PAWN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[W_PAWN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[W_PAWN], pos);
+
+  pos.x = offsetX;
+  pos.y += BOARD_CELL_SIZE * 5;
+
+  DrawPiece(store->textures[B_PAWN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_PAWN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_PAWN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_PAWN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_PAWN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_PAWN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_PAWN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_PAWN], pos);
+
+  pos.x = offsetX;
+  pos.y += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_ROOK], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_KNIGHT], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_BISHOP], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_QUEEN], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_KING], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_BISHOP], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_KNIGHT], pos);
+  pos.x += BOARD_CELL_SIZE;
+  DrawPiece(store->textures[B_ROOK], pos);
 }
 
 int main() {
@@ -70,11 +138,7 @@ int main() {
   // Create the window and OpenGL context
   InitWindow(1920, 1080, "Hello Raylib");
 
-  // Utility function from resource_dir.h to find the resources folder and set
-  // it as the current working directory so we can load from it
-  SearchAndSetResourceDir("resources");
-
-  Texture pawn = LoadTexture("w_pawn_png_128px.png");
+  TextureStore *textureStore = LoadTextures();
 
   // game loop
   while (!WindowShouldClose()) // run the loop untill the user presses ESCAPE or
@@ -88,7 +152,7 @@ int main() {
     DrawBackground();
 
     DrawChessboard();
-    DrawPieces(pawn);
+    DrawPieces(textureStore);
 
     // end the frame and get ready for the next one  (display frame, poll input,
     // etc...)
@@ -97,7 +161,7 @@ int main() {
 
   // cleanup
   // unload our texture so it can be cleaned up
-  UnloadTexture(pawn);
+  UnloadTextures(textureStore);
 
   // destroy the window and cleanup the OpenGL context
   CloseWindow();
