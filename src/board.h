@@ -1,5 +1,11 @@
+#ifndef BOARD_H
+#define BOARD_H
+
 #include <stdbool.h>
 #include <stddef.h>
+
+const int BOARD_CELL_SIZE = 64;
+const int BOARD_WIDTH = BOARD_CELL_SIZE * 8;
 
 typedef enum {
   EMPTY,
@@ -98,3 +104,5 @@ Board InitBoard() {
 
   return board;
 }
+
+#endif

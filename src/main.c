@@ -11,10 +11,10 @@ https://creativecommons.org/publicdomain/zero/1.0/
 #include "board.h"
 #include "raylib.h"
 #include "texture_loader.h"
+#include <assert.h>
+#include <stdio.h>
 
 const float PIECE_SCALE = 0.45f;
-const int BOARD_CELL_SIZE = 64;
-const int BOARD_WIDTH = BOARD_CELL_SIZE * 8;
 
 Texture TextureForPiece(TextureStore *store, Piece piece) {
   int index;
@@ -57,18 +57,33 @@ void DrawPiece(Texture texture, Vector2 pos) {
   DrawTextureEx(texture, pos, 0.0f, PIECE_SCALE, WHITE);
 }
 
+Vector2 BoardOffset() {
+  int offsetX = GetScreenWidth() / 2 - BOARD_WIDTH / 2;
+  int offsetY = GetScreenHeight() / 2 - BOARD_WIDTH / 2;
+
+  Vector2 offset = {.x = offsetX, .y = offsetY};
+
+  return offset;
+}
+
 void DrawChessboard(TextureStore *store, Board *board) {
   bool isWhite = true;
   Color sqrColor = WHITE;
 
-  int offsetX = GetScreenWidth() / 2 - BOARD_WIDTH / 2;
-  int offsetY = GetScreenHeight() / 2 - BOARD_WIDTH / 2;
+  Vector2 offset = BoardOffset();
 
-  Vector2 pos = {.x = BOARD_CELL_SIZE + offsetX, .y = BOARD_CELL_SIZE + offsetY};
+  Vector2 pos = offset;
   Vector2 size = {.x = BOARD_CELL_SIZE, .y = BOARD_CELL_SIZE};
 
   for (int i = 0; i < board->board_size; i++) {
-    DrawRectangleV(pos, size, isWhite ? WHITE : BLACK);
+
+    if (board->squares[i].isSelected) {
+      sqrColor = YELLOW;
+    } else {
+      sqrColor = isWhite ? WHITE : BLACK;
+    }
+
+    DrawRectangleV(pos, size, sqrColor);
 
     if (board->squares[i].piece.type != EMPTY) {
       Texture pieceTexture = TextureForPiece(store, board->squares[i].piece);
@@ -79,7 +94,7 @@ void DrawChessboard(TextureStore *store, Board *board) {
     pos.x += BOARD_CELL_SIZE;
     if ((i + 1) % 8 == 0) {
       pos.y += BOARD_CELL_SIZE;
-      pos.x = BOARD_CELL_SIZE + offsetX;
+      pos.x = offset.x;
       isWhite = !isWhite;
     }
   }
@@ -89,6 +104,34 @@ void DrawBackground() {
   Color fromGradient = {.r = 90, .g = 250, .b = 245, .a = 100};
   Color toGradient = {.r = 90, .g = 250, .b = 245, .a = 50};
   DrawRectangleGradientV(0, 0, GetScreenWidth(), GetScreenHeight(), fromGradient, toGradient);
+}
+
+void CheckForInput(Board *board) {
+  if (IsMouseButtonPressed(0)) {
+    Vector2 mouse_pos = GetMousePosition();
+    fprintf(stderr, "Mouse click pressed at X:%f Y%f\n", mouse_pos.x, mouse_pos.y);
+
+    Vector2 offset = BoardOffset();
+
+    if ((mouse_pos.x > offset.x && mouse_pos.x < offset.x + BOARD_WIDTH) &&
+        (mouse_pos.y > offset.y && mouse_pos.y < offset.y + BOARD_WIDTH)) {
+      fprintf(stderr, "Mouse click is on board \n");
+
+      Vector2 local_pos = {.x = mouse_pos.x - offset.x, .y = mouse_pos.y - offset.y};
+      fprintf(stderr, "Mouse click is on local cordinates : %f:%f\n", local_pos.x, local_pos.y);
+      int x_index = (int)local_pos.x / BOARD_CELL_SIZE;
+      int y_index = (int)local_pos.y / BOARD_CELL_SIZE;
+      int selected = x_index + y_index * 8;
+      fprintf(stderr, "Mouse click is on board row with selected index : %d\n", selected);
+
+      assert(selected < board->board_size);
+
+      for (int i = 0; i < board->board_size; i++) {
+        board->squares[i].isSelected = false;
+      }
+      board->squares[selected].isSelected = true;
+    }
+  }
 }
 
 int main() {
@@ -113,8 +156,8 @@ int main() {
     ClearBackground(BLACK);
     DrawBackground();
 
+    CheckForInput(&board);
     DrawChessboard(textureStore, &board);
-    // DrawPieces(textureStore);
 
     // end the frame and get ready for the next one  (display frame, poll input,
     // etc...)
